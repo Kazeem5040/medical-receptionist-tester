@@ -1,0 +1,19 @@
+[project]
+name = "medical-ai-receptionist"
+version = "0.1.0"
+description = "Production-minded AI testing platform for medical AI receptionists."
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.7,<3",
+    "typing-extensions>=4.12",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.2",
+    "pytest-asyncio>=0.24",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

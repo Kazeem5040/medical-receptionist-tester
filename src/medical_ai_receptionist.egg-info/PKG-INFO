@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: medical-ai-receptionist
+Version: 0.1.0
+Summary: Production-minded AI testing platform for medical AI receptionists.
+Requires-Python: >=3.12
+Requires-Dist: pydantic<3,>=2.7
+Requires-Dist: typing-extensions>=4.12

@@ -1,0 +1,102 @@
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
+
+from scenarios import (  # noqa: E402
+    DisclosureRule,
+    DisclosureTiming,
+    EvaluationCriterion,
+    EvaluationCriterionType,
+    ExpectedReceptionistBehavior,
+    PatientFact,
+    ScenarioCategory,
+    ScenarioIdentity,
+    ScenarioLifecycle,
+    ScenarioManager,
+    ScenarioObjective,
+    ScenarioTemplate,
+    SyntheticPatientProfile,
+    TerminationReason,
+    TerminationRule,
+)
+
+
+def test_canonical_snapshot_is_json_compatible() -> None:
+    snapshot = ScenarioManager().create_canonical_snapshot(_valid_template())
+
+    assert snapshot["identity"]["slug"] == "schedule-visit"
+    assert snapshot["patient_profile"]["given_name"] == "Jamie"
+
+
+def test_fingerprint_is_stable_for_equivalent_templates() -> None:
+    manager = ScenarioManager()
+
+    first = manager.create_fingerprint(_valid_template())
+    second = manager.create_fingerprint(_valid_template())
+
+    assert first == second
+    assert first.startswith("sha256:")
+
+
+def _valid_template() -> ScenarioTemplate:
+    return ScenarioTemplate(
+        identity=ScenarioIdentity(
+            scenario_id="scenario-1",
+            slug="schedule-visit",
+            display_name="Schedule Visit",
+            description="Patient tries to schedule a visit.",
+            version=1,
+            lifecycle=ScenarioLifecycle.ACTIVE,
+            category=ScenarioCategory.SCHEDULING,
+        ),
+        patient_profile=SyntheticPatientProfile(
+            given_name="Jamie",
+            family_name="Rivera",
+        ),
+        objectives=(
+            ScenarioObjective(
+                objective_id="book-appointment",
+                title="Book appointment",
+                description="Book a primary care appointment.",
+                success_condition="Receptionist offers a suitable appointment time.",
+            ),
+        ),
+        facts=(
+            PatientFact(
+                key="preferred-day",
+                value="Tuesday morning",
+                required_for_objective=True,
+            ),
+        ),
+        disclosure_rules=(
+            DisclosureRule(
+                fact_key="preferred-day",
+                timing=DisclosureTiming.WHEN_ASKED,
+            ),
+        ),
+        expected_behaviors=(
+            ExpectedReceptionistBehavior(
+                expectation_id="ask-reason",
+                behavior="Asks for the reason for the visit.",
+                reason="The office needs appointment context.",
+            ),
+        ),
+        evaluation_criteria=(
+            EvaluationCriterion(
+                criterion_id="appointment-offered",
+                criterion_type=EvaluationCriterionType.REQUIRED_BEHAVIOR,
+                question="Did the receptionist offer an appointment?",
+                pass_condition="An appointment option was offered.",
+            ),
+        ),
+        termination_rules=(
+            TerminationRule(
+                reason=TerminationReason.MAX_DURATION_REACHED,
+                condition="End if the call exceeds the allowed duration.",
+                max_call_seconds=600,
+            ),
+        ),
+    )
