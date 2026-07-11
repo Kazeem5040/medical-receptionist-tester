@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
-from typing_extensions import Annotated
 
 from .enums import (
     DisclosureTiming,
@@ -110,7 +109,9 @@ class ExpectedReceptionistBehavior(ScenarioModel):
 
     expectation_id: SlugString
     behavior: NonEmptyString
-    importance: ReceptionistBehaviorImportance = ReceptionistBehaviorImportance.IMPORTANT
+    importance: ReceptionistBehaviorImportance = (
+        ReceptionistBehaviorImportance.IMPORTANT
+    )
     reason: NonEmptyString
     evidence_hint: NonEmptyString | None = None
 

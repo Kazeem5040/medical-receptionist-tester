@@ -163,7 +163,10 @@ def _validate_disclosure_rules(
             issues.append(
                 _issue(
                     code="disclosure_rule_unknown_fact",
-                    message=f"Disclosure rule references unknown fact: {rule.fact_key}.",
+                    message=(
+                        "Disclosure rule references unknown fact: "
+                        f"{rule.fact_key}."
+                    ),
                     path=("disclosure_rules", rule.fact_key),
                 ),
             )

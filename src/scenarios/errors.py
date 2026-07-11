@@ -57,7 +57,7 @@ class ScenarioValidationResult(BaseModel):
     def from_issues(
         cls,
         issues: Iterable[ScenarioValidationIssue],
-    ) -> "ScenarioValidationResult":
+    ) -> ScenarioValidationResult:
         """Build a validation result from any iterable of issues."""
 
         return cls(issues=tuple(issues))

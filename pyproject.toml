@@ -1,5 +1,5 @@
 [project]
-name = "medical-ai-receptionist"
+name = "ai-receptionist-tester"
 version = "0.1.0"
 description = "Production-minded AI testing platform for medical AI receptionists."
 requires-python = ">=3.12"
@@ -10,10 +10,30 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "mypy>=1.11",
     "pytest>=8.2",
     "pytest-asyncio>=0.24",
+    "ruff>=0.6",
 ]
 
 [tool.pytest.ini_options]
+addopts = ["--import-mode=importlib"]
 pythonpath = ["src"]
 testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.13"
+files = [
+    "src/scenarios",
+    "src/conversation_contracts",
+    "src/vapi_adapter",
+    "src/call_orchestrator",
+]
+strict = true
