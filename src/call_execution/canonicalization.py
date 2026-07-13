@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel
@@ -31,6 +32,9 @@ def to_canonical_data(value: Any, *, exclude_none: bool = True) -> Any:
             for item in value
             if not (exclude_none and item is None)
         ]
+
+    if isinstance(value, datetime):
+        return value.isoformat()
 
     return value
 

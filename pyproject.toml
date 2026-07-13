@@ -37,5 +37,6 @@ files = [
     "src/vapi_adapter",
     "src/call_orchestrator",
     "src/vapi_client",
+    "src/call_execution",
 ]
 strict = true

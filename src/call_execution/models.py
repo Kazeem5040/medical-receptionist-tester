@@ -7,7 +7,12 @@ from typing import Annotated, Any
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
-from .enums import ExecutionSeverity, ExecutionStatus, ProviderName, ProviderResponseState
+from .enums import (
+    ExecutionSeverity,
+    ExecutionStatus,
+    ProviderName,
+    ProviderResponseState,
+)
 
 NonEmptyString = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 

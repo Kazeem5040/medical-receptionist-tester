@@ -86,7 +86,10 @@ def validate_prepared_call_for_execution(
         issues.append(
             _issue(
                 code="provider_payload_unavailable",
-                message=f"PreparedCall provider payload could not be extracted: {error}.",
+                message=(
+                    "PreparedCall provider payload could not be extracted: "
+                    f"{error}."
+                ),
                 path=("provider_payload",),
             ),
         )
@@ -173,7 +176,9 @@ def validate_call_submission_result(
     return CallExecutionValidationResult.from_issues(issues)
 
 
-def normalize_provider_state(response: VapiCreateAssistantResponse) -> ProviderResponseState:
+def normalize_provider_state(
+    response: VapiCreateAssistantResponse,
+) -> ProviderResponseState:
     """Convert a Vapi client response into an execution-level provider state."""
 
     if response.response_status.value == "success":
