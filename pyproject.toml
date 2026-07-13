@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Production-minded AI testing platform for medical AI receptionists."
 requires-python = ">=3.12"
 dependencies = [
+    "httpx>=0.27,<1",
     "pydantic>=2.7,<3",
     "typing-extensions>=4.12",
 ]
@@ -35,5 +36,6 @@ files = [
     "src/conversation_contracts",
     "src/vapi_adapter",
     "src/call_orchestrator",
+    "src/vapi_client",
 ]
 strict = true
