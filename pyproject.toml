@@ -40,5 +40,6 @@ files = [
     "src/call_execution",
     "src/call_monitoring",
     "src/runtime_config",
+    "src/application",
 ]
 strict = true

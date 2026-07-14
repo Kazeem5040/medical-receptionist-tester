@@ -144,7 +144,9 @@ def _validate_runtime_compatibility(
             issues.append(
                 _issue(
                     code="production_debug_enabled",
-                    message="Bootstrapped production application must not enable debug.",
+                    message=(
+                        "Bootstrapped production application must not enable debug."
+                    ),
                     path=("runtime_config", "application", "debug_enabled"),
                 ),
             )
