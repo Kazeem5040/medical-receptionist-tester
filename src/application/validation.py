@@ -8,6 +8,7 @@ from call_orchestrator import CallOrchestrator
 from conversation_contracts import ConversationContractBuilder
 from runtime_config import RuntimeConfiguration, RuntimeEnvironment
 from scenarios import ScenarioManager
+from test_call_workflow import TestCallCoordinator
 from vapi_adapter import VapiProviderAdapter
 from vapi_client import VapiApiClient
 
@@ -115,6 +116,13 @@ def _validate_services(
             "call_execution_service",
             issues,
         )
+        if policy.require_test_call_coordinator:
+            _require_instance(
+                services.test_call_coordinator,
+                TestCallCoordinator,
+                "test_call_coordinator",
+                issues,
+            )
 
     if policy.require_vapi_client:
         _require_instance(

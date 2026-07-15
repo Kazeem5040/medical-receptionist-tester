@@ -65,6 +65,7 @@ def test_validate_application_detects_invalid_dependency_graph() -> None:
         vapi_client=application.services.vapi_client,
         call_execution_service=application.services.call_execution_service,
         call_monitoring_collector=application.services.call_monitoring_collector,
+        test_call_coordinator=application.services.test_call_coordinator,
     )
     invalid = Application.model_construct(
         runtime_config=application.runtime_config,

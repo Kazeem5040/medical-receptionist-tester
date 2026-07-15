@@ -17,6 +17,7 @@ class ApplicationBootstrapPolicy(BaseModel):
     require_domain_services: bool = True
     require_workflow_services: bool = True
     require_monitoring_services: bool = True
+    require_test_call_coordinator: bool = True
 
 
 DEFAULT_APPLICATION_BOOTSTRAP_POLICY = ApplicationBootstrapPolicy()

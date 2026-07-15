@@ -41,5 +41,6 @@ files = [
     "src/call_monitoring",
     "src/runtime_config",
     "src/application",
+    "src/test_call_workflow",
 ]
 strict = true

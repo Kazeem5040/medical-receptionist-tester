@@ -12,6 +12,7 @@ from call_orchestrator import CallOrchestrator
 from conversation_contracts import ConversationContractBuilder
 from runtime_config import RuntimeConfiguration
 from scenarios import ScenarioManager
+from test_call_workflow import TestCallCoordinator
 from vapi_adapter import VapiProviderAdapter
 from vapi_client import VapiApiClient
 
@@ -49,6 +50,7 @@ class ApplicationServices(ApplicationModel):
     vapi_client: VapiApiClient
     call_execution_service: CallExecutionService
     call_monitoring_collector: CallSessionCollector
+    test_call_coordinator: TestCallCoordinator
 
 
 class Application(ApplicationModel):

@@ -16,6 +16,7 @@ from call_orchestrator import CallOrchestrator
 from conversation_contracts import ConversationContractBuilder
 from runtime_config import RuntimeConfiguration, load_runtime_configuration
 from scenarios import ScenarioManager
+from test_call_workflow import TestCallCoordinator
 from vapi_adapter import VapiProviderAdapter
 from vapi_client import VapiApiClient, VapiClientPolicy
 
@@ -52,6 +53,10 @@ def bootstrap_application(
     )
     call_execution_service = CallExecutionService(vapi_client=vapi_client)
     call_monitoring_collector = CallSessionCollector()
+    test_call_coordinator = TestCallCoordinator(
+        call_orchestrator=call_orchestrator,
+        call_execution_service=call_execution_service,
+    )
 
     application = Application(
         runtime_config=resolved_runtime_config,
@@ -63,6 +68,7 @@ def bootstrap_application(
             vapi_client=vapi_client,
             call_execution_service=call_execution_service,
             call_monitoring_collector=call_monitoring_collector,
+            test_call_coordinator=test_call_coordinator,
         ),
         startup_metadata=ApplicationStartupMetadata(
             application_version=policy.application_version,

@@ -7,6 +7,7 @@ from call_orchestrator import CallOrchestrator
 from conversation_contracts import ConversationContractBuilder
 from runtime_config import RuntimeEnvironment, load_runtime_configuration
 from scenarios import ScenarioManager
+from test_call_workflow import TestCallCoordinator as WorkflowCoordinator
 from vapi_adapter import VapiProviderAdapter
 from vapi_client import VapiApiClient
 
@@ -29,6 +30,21 @@ def test_bootstrap_application_assembles_completed_services() -> None:
     assert isinstance(
         application.services.call_monitoring_collector,
         CallSessionCollector,
+    )
+    assert isinstance(
+        application.services.test_call_coordinator,
+        WorkflowCoordinator,
+    )
+
+
+def test_bootstrap_injects_same_instances_into_test_call_coordinator() -> None:
+    application = bootstrap_application(environ=_required_env())
+    coordinator = application.services.test_call_coordinator
+
+    assert coordinator._call_orchestrator is application.services.call_orchestrator
+    assert (
+        coordinator._call_execution_service
+        is application.services.call_execution_service
     )
 
 
@@ -80,6 +96,7 @@ def test_bootstrap_does_not_execute_calls_or_monitor_sessions() -> None:
     assert hasattr(application.services.call_orchestrator, "prepare_call")
     assert hasattr(application.services.call_execution_service, "execute")
     assert hasattr(application.services.call_monitoring_collector, "collect")
+    assert hasattr(application.services.test_call_coordinator, "start_test")
 
 
 def _required_env(**overrides: str) -> dict[str, str]:
