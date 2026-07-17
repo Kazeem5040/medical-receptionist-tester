@@ -56,10 +56,33 @@ class VapiCreateAssistantRequest(VapiClientModel):
     configuration_fingerprint: NonEmptyString | None = None
 
 
+class VapiCreateCallRequest(VapiClientModel):
+    """Prepared Vapi outbound call creation HTTP request."""
+
+    method: HttpMethod = HttpMethod.POST
+    url: NonEmptyString
+    headers: dict[str, str]
+    json_payload: dict[str, Any]
+    idempotency_key: NonEmptyString | None = None
+
+
 class VapiCreateAssistantResponse(VapiClientModel):
     """Typed response for successful Vapi assistant creation."""
 
     assistant_id: VapiAssistantId
+    response_status: VapiResponseStatus = VapiResponseStatus.SUCCESS
+    provider_status: ProviderResourceStatus = ProviderResourceStatus.CREATED
+    http_status: VapiHttpStatus
+    provider_metadata: VapiProviderMetadata = Field(
+        default_factory=VapiProviderMetadata,
+    )
+    raw_response: dict[str, Any]
+
+
+class VapiCreateCallResponse(VapiClientModel):
+    """Typed response for successful Vapi outbound call creation."""
+
+    call_id: VapiCallId
     response_status: VapiResponseStatus = VapiResponseStatus.SUCCESS
     provider_status: ProviderResourceStatus = ProviderResourceStatus.CREATED
     http_status: VapiHttpStatus

@@ -27,7 +27,10 @@ from .models import (
     VapiAssistantId,
     VapiCreateAssistantRequest,
     VapiCreateAssistantResponse,
+    VapiCreateCallRequest,
+    VapiCreateCallResponse,
     VapiHttpStatus,
+    VapiCallId,
     VapiProviderMetadata,
 )
 from .policies import DEFAULT_VAPI_CLIENT_POLICY, VapiClientPolicy
@@ -36,11 +39,13 @@ from .validation import (
     validate_api_key,
     validate_assistant_payload,
     validate_assistant_response_body,
+    validate_call_response_body,
+    validate_outbound_call_payload,
 )
 
 
 class VapiApiClient:
-    """Async client for Vapi assistant creation."""
+    """Async client for Vapi assistant and outbound call creation."""
 
     def __init__(
         self,
@@ -101,6 +106,20 @@ class VapiApiClient:
         )
         return await self._send_create_assistant_request(request)
 
+    async def create_outbound_call(
+        self,
+        payload: dict[str, Any],
+        *,
+        idempotency_key: str | None = None,
+    ) -> VapiCreateCallResponse:
+        """Create a Vapi outbound call from an already-built call payload."""
+
+        request = self.build_create_call_request(
+            payload=payload,
+            idempotency_key=idempotency_key,
+        )
+        return await self._send_create_call_request(request)
+
     def build_create_assistant_request(
         self,
         *,
@@ -115,6 +134,22 @@ class VapiApiClient:
             headers=self._headers(),
             json_payload=payload,
             configuration_fingerprint=configuration_fingerprint,
+        )
+
+    def build_create_call_request(
+        self,
+        *,
+        payload: dict[str, Any],
+        idempotency_key: str | None = None,
+    ) -> VapiCreateCallRequest:
+        """Build and validate the Vapi Create Call request without sending it."""
+
+        validate_outbound_call_payload(payload)
+        return VapiCreateCallRequest(
+            url=self._create_call_url(),
+            headers=self._headers(),
+            json_payload=payload,
+            idempotency_key=idempotency_key,
         )
 
     async def _send_create_assistant_request(
@@ -137,9 +172,29 @@ class VapiApiClient:
             raw_response=body,
         )
 
+    async def _send_create_call_request(
+        self,
+        request: VapiCreateCallRequest,
+    ) -> VapiCreateCallResponse:
+        response = await self._post_with_retries(request)
+        self._raise_for_response_status(response)
+        body = self._parse_json_response(response)
+        call_id = validate_call_response_body(body)
+        return VapiCreateCallResponse(
+            call_id=VapiCallId(value=call_id),
+            http_status=VapiHttpStatus(
+                status_code=response.status_code,
+                reason_phrase=response.reason_phrase,
+            ),
+            provider_metadata=VapiProviderMetadata(
+                values=_safe_metadata(body.get("metadata")),
+            ),
+            raw_response=body,
+        )
+
     async def _post_with_retries(
         self,
-        request: VapiCreateAssistantRequest,
+        request: VapiCreateAssistantRequest | VapiCreateCallRequest,
     ) -> httpx.Response:
         attempt = 0
         delay = self._policy.backoff_initial_seconds
@@ -227,8 +282,13 @@ class VapiApiClient:
             return None
 
     def _create_assistant_url(self) -> str:
+        return self._url_for_path(self._policy.create_assistant_path)
+
+    def _create_call_url(self) -> str:
+        return self._url_for_path(self._policy.create_call_path)
+
+    def _url_for_path(self, path: str) -> str:
         base = str(self._policy.base_url).rstrip("/")
-        path = self._policy.create_assistant_path
         if not path.startswith("/"):
             path = f"/{path}"
         return f"{base}{path}"

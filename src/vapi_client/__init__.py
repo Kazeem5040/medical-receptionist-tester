@@ -23,6 +23,8 @@ from .models import (
     VapiCallId,
     VapiCreateAssistantRequest,
     VapiCreateAssistantResponse,
+    VapiCreateCallRequest,
+    VapiCreateCallResponse,
     VapiHttpStatus,
     VapiProviderMetadata,
 )
@@ -42,6 +44,8 @@ __all__ = [
     "VapiClientValidationSeverity",
     "VapiCreateAssistantRequest",
     "VapiCreateAssistantResponse",
+    "VapiCreateCallRequest",
+    "VapiCreateCallResponse",
     "VapiHttpStatus",
     "VapiNetworkError",
     "VapiProviderMetadata",

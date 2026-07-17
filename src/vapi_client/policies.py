@@ -13,6 +13,7 @@ class VapiClientPolicy(BaseModel):
     base_url: str = Field(default="https://api.vapi.ai", min_length=1)
     api_version: str = "v1"
     create_assistant_path: str = "/assistant"
+    create_call_path: str = "/call"
     user_agent: str = "ai-receptionist-tester/0.1"
     timeout_seconds: float = Field(default=30.0, gt=0)
     max_retries: int = Field(default=2, ge=0)
