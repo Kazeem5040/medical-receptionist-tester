@@ -176,6 +176,54 @@ def test_invalid_payload_is_rejected_before_request() -> None:
         )
 
 
+def test_invalid_outbound_call_payload_is_rejected_before_request() -> None:
+    with pytest.raises(VapiSerializationError):
+        VapiApiClient(api_key="test-key").build_create_call_request(
+            payload={
+                "assistantId": "asst_123",
+                "customer": {"number": "+15551234567"},
+            },
+        )
+
+
+@pytest.mark.asyncio
+async def test_successful_outbound_call_creation() -> None:
+    seen_requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen_requests.append(request)
+        return httpx.Response(
+            201,
+            json={
+                "id": "call_123",
+                "status": "queued",
+                "metadata": {"source": "unit-test"},
+            },
+        )
+
+    async with _client(handler, api_key="test-key") as client:
+        response = await client.create_outbound_call(
+            {
+                "assistantId": "asst_123",
+                "phoneNumberId": "phone_123",
+                "customer": {"number": "+15551234567"},
+            },
+            idempotency_key="idem-key-0001",
+        )
+
+    request = seen_requests[0]
+    payload = _json_body(request)
+    assert response.call_id.value == "call_123"
+    assert response.http_status.status_code == 201
+    assert response.provider_metadata.values == {"source": "unit-test"}
+    assert request.method == "POST"
+    assert str(request.url) == "https://api.vapi.ai/call"
+    assert request.headers["Authorization"] == "Bearer test-key"
+    assert payload["assistantId"] == "asst_123"
+    assert payload["phoneNumberId"] == "phone_123"
+    assert payload["customer"] == {"number": "+15551234567"}
+
+
 @pytest.mark.asyncio
 async def test_invalid_response_missing_id_is_rejected() -> None:
     async with _client(
@@ -183,6 +231,21 @@ async def test_invalid_response_missing_id_is_rejected() -> None:
     ) as client:
         with pytest.raises(VapiResponseValidationError):
             await client.create_assistant_from_prepared_call(prepared_call())
+
+
+@pytest.mark.asyncio
+async def test_invalid_call_response_missing_id_is_rejected() -> None:
+    async with _client(
+        lambda _request: httpx.Response(201, json={"status": "queued"}),
+    ) as client:
+        with pytest.raises(VapiResponseValidationError):
+            await client.create_outbound_call(
+                {
+                    "assistantId": "asst_123",
+                    "phoneNumberId": "phone_123",
+                    "customer": {"number": "+15551234567"},
+                },
+            )
 
 
 def test_missing_api_key_is_rejected() -> None:

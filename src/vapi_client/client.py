@@ -25,12 +25,12 @@ from .errors import (
 )
 from .models import (
     VapiAssistantId,
+    VapiCallId,
     VapiCreateAssistantRequest,
     VapiCreateAssistantResponse,
     VapiCreateCallRequest,
     VapiCreateCallResponse,
     VapiHttpStatus,
-    VapiCallId,
     VapiProviderMetadata,
 )
 from .policies import DEFAULT_VAPI_CLIENT_POLICY, VapiClientPolicy
