@@ -43,5 +43,6 @@ files = [
     "src/application",
     "src/test_call_workflow",
     "src/outbound_calls",
+    "src/call_sessions",
 ]
 strict = true
